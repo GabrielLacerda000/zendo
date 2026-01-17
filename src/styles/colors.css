@@ -1,0 +1,9 @@
+@theme {
+    /* backgrounds */
+    --color-brand-background: #121614;
+    --color-brand-background-secondary: #181E1B;
+    --color-brand-background-tertiary: #1F2723;
+    
+    /* borders */
+    --color-brand-border: #26312C;
+}
