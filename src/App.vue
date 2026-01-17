@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import BaseInput from './shared/components/BaseInput.vue'
 import BaseSelect from './shared/components/BaseSelect.vue'
 import TodoItem from './modules/todo/components/TodoItem.vue'
 import ListContainer from './modules/list/components/ListContainer.vue'
+import { initializeApp } from './shared/utils/init'
+
+// App initialization state
+const isLoading = ref(true)
 
 // Static prototype - refs not really used but show v-model structure
 const todoInput = ref('')
@@ -21,10 +25,24 @@ const listOptions = [
   { value: 'personal', label: 'personal' },
   { value: 'work', label: 'work' }
 ]
+
+// Initialize app on mount
+onMounted(async () => {
+  try {
+    await initializeApp()
+  } catch (error) {
+    console.error('Failed to initialize app:', error)
+  } finally {
+    isLoading.value = false
+  }
+})
 </script>
 
 <template>
-  <div class="min-h-screen bg-brand-background p-8">
+  <div v-if="isLoading" class="min-h-screen bg-brand-background flex items-center justify-center">
+    <div class="text-brand-text">Loading...</div>
+  </div>
+  <div v-else class="min-h-screen bg-brand-background p-8">
     <!-- Top controls section -->
     <div class="flex gap-4 mb-8 items-center">
       <BaseInput
