@@ -4,15 +4,22 @@ import BaseInput from './shared/components/BaseInput.vue'
 import BaseSelect from './shared/components/BaseSelect.vue'
 import TodoItem from './modules/todo/components/TodoItem.vue'
 import ListContainer from './modules/list/components/ListContainer.vue'
+import TodoDetailModal from './shared/components/TodoDetailModal.vue'
 import { initializeApp } from './shared/utils/init'
 import { useListStore } from './modules/lists/stores/listStore'
 import { useTodoStore } from './modules/todos/stores/todoStore'
+import type { Todo } from '@/types/Todo'
+import Btn from './shared/components/Btn.vue'
 
 const listStore = useListStore()
 const todoStore = useTodoStore()
 
 // App initialization state
 const isLoading = ref(true)
+
+// Modal state
+const selectedTodo = ref<Todo | null>(null)
+const isTodoModalOpen = ref(false)
 
 // Static prototype - refs not really used but show v-model structure
 const todoInput = ref('')
@@ -58,6 +65,17 @@ const handleCreateList = async () => {
   selectedList.value = newList.id
 }
 
+// Modal handlers
+const openTodoModal = (todo: Todo) => {
+  selectedTodo.value = todo
+  isTodoModalOpen.value = true
+}
+
+const closeTodoModal = () => {
+  isTodoModalOpen.value = false
+  selectedTodo.value = null
+}
+
 // Initialize app on mount
 onMounted(async () => {
   try {
@@ -95,12 +113,7 @@ onMounted(async () => {
         :options="listOptions"
         class="w-48"
       />
-      <button
-        @click="handleCreateList"
-        class="px-3 py-2 bg-emerald-600 text-gray-200 rounded-xl hover:bg-emerald-700 cursor-pointer"
-      >
-        Add List
-      </button>
+      <Btn label="Add List" @click="handleCreateList" />
     </div>
 
     <!-- Two-column lists section -->
@@ -113,7 +126,8 @@ onMounted(async () => {
         <TodoItem
           v-for="todo in todoStore.todosByList(list.id)"
           :key="todo.id"
-          :text="todo.title"
+          :todo="todo"
+          @click="openTodoModal(todo)"
         />
         <div
           v-if="todoStore.todosByList(list.id).length === 0"
@@ -130,5 +144,12 @@ onMounted(async () => {
         No lists yet. Click "Add List" to get started.
       </div>
     </div>
+
+    <!-- Todo Detail Modal -->
+    <TodoDetailModal
+      v-if="isTodoModalOpen && selectedTodo"
+      :todo="selectedTodo"
+      @close="closeTodoModal"
+    />
   </div>
 </template>
