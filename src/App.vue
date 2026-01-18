@@ -8,8 +8,8 @@ import TodoDetailModal from './shared/components/TodoDetailModal.vue'
 import { initializeApp } from './shared/utils/init'
 import { useListStore } from './modules/lists/stores/listStore'
 import { useTodoStore } from './modules/todos/stores/todoStore'
-import type { Todo } from '@/types/Todo'
 import Btn from './shared/components/Btn.vue'
+import { Todo } from './types/Todo'
 
 const listStore = useListStore()
 const todoStore = useTodoStore()
