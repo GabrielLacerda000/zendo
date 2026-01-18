@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, nextTick } from 'vue';
 import { useTodoStore } from '../../todos/stores/todoStore';
 import { cn } from '../../../shared/utils/cn';
 import { Todo } from '../../../types/Todo';
@@ -12,6 +12,11 @@ interface Props {
 const props = defineProps<Props>()
 const todoStore = useTodoStore()
 
+// Local state for title editing
+const isEditingTitle = ref(false)
+const localTitle = ref(props.todo.title)
+const titleInputRef = ref<HTMLInputElement | null>(null)
+
 const completedChecklistCount = computed(() => {
   return props.todo.checklist.filter(item => item.completed).length
 })
@@ -19,6 +24,33 @@ const completedChecklistCount = computed(() => {
 const handleDelete = (event: Event) => {
   event.stopPropagation()
   todoStore.deleteTodo(props.todo.id)
+}
+
+// Title editing methods
+const startEditingTitle = (event: Event) => {
+  event.stopPropagation() // Prevent modal from opening
+  localTitle.value = props.todo.title
+  isEditingTitle.value = true
+  nextTick(() => {
+    titleInputRef.value?.focus()
+    titleInputRef.value?.select()
+  })
+}
+
+const saveTitle = async () => {
+  const trimmedTitle = localTitle.value.trim()
+  if (trimmedTitle && trimmedTitle !== props.todo.title) {
+    await todoStore.updateTodo(props.todo.id, { title: trimmedTitle })
+  } else if (!trimmedTitle) {
+    // If empty, revert to original
+    localTitle.value = props.todo.title
+  }
+  isEditingTitle.value = false
+}
+
+const cancelEditTitle = () => {
+  localTitle.value = props.todo.title
+  isEditingTitle.value = false
 }
 </script>
 
@@ -41,8 +73,24 @@ const handleDelete = (event: Event) => {
       </svg>
     </button>
 
-    <!-- Todo title -->
-    <div class="text-brand-text">{{ todo.title }}</div>
+    <!-- Todo title - double-click to edit -->
+    <div
+      v-if="!isEditingTitle"
+      @dblclick="startEditingTitle"
+      class="text-brand-text cursor-text select-none"
+    >
+      {{ todo.title }}
+    </div>
+    <baseIpun
+      v-else
+      ref="titleInputRef"
+      v-model="localTitle"
+      @blur="saveTitle"
+      @keyup.enter="saveTitle"
+      @keyup.esc="cancelEditTitle"
+      @click.stop
+      class="w-full bg-brand-background border border-blue-500 rounded px-2 py-1 text-brand-text focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
 
     <!-- Indicators row -->
     <div v-if="todo.description || todo.checklist.length > 0" class="flex gap-2 mt-2 items-center">

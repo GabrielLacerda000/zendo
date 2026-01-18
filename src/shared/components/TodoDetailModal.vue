@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, nextTick } from "vue";
 import { Todo } from "../../types/Todo";
 import { useTodoStore } from "../../modules/todos/stores/todoStore";
 import Btn from "./Btn.vue";
@@ -15,6 +15,11 @@ const emit = defineEmits<{
 }>();
 
 const todoStore = useTodoStore();
+
+// Local state for title editing
+const isEditingTitle = ref(false);
+const localTitle = ref(props.todo.title);
+const titleInputRef = ref<InstanceType<typeof BaseInput> | null>(null);
 
 // Local state for description (for optimistic updates)
 const localDescription = ref(props.todo.description || "");
@@ -52,6 +57,31 @@ const updateChecklistItem = async (itemId: string, text: string) => {
 const deleteChecklistItem = async (itemId: string) => {
     await todoStore.deleteChecklistItem(props.todo.id, itemId);
 };
+
+// Title editing methods
+const startEditingTitle = () => {
+    localTitle.value = props.todo.title;
+    isEditingTitle.value = true;
+    nextTick(() => {
+        titleInputRef.value?.focus();
+    });
+};
+
+const saveTitle = async () => {
+    const trimmedTitle = localTitle.value.trim();
+    if (trimmedTitle && trimmedTitle !== props.todo.title) {
+        await todoStore.updateTodo(props.todo.id, { title: trimmedTitle });
+    } else if (!trimmedTitle) {
+        // If empty, revert to original
+        localTitle.value = props.todo.title;
+    }
+    isEditingTitle.value = false;
+};
+
+const cancelEditTitle = () => {
+    localTitle.value = props.todo.title;
+    isEditingTitle.value = false;
+};
 </script>
 
 <template>
@@ -67,9 +97,23 @@ const deleteChecklistItem = async (itemId: string) => {
             <!-- Header -->
             <div class="p-6 border-b border-brand-border">
                 <div class="flex items-start justify-between">
-                    <h2 class="text-xl font-semibold text-brand-text">
+                    <!-- Title - click to edit -->
+                    <h2
+                        v-if="!isEditingTitle"
+                        @click="startEditingTitle"
+                        class="text-xl font-semibold text-brand-text cursor-pointer hover:bg-brand-background rounded px-2 py-1 -ml-2 transition-colors"
+                    >
                         {{ todo.title }}
                     </h2>
+                    <BaseInput
+                        v-else
+                        ref="titleInputRef"
+                        v-model="localTitle"
+                        @blur="saveTitle"
+                        @keyup.enter="saveTitle"
+                        @keyup.esc="cancelEditTitle"
+                        class="text-xl font-semibold flex-1 mr-4"
+                    />
                     <button
                         @click="emit('close')"
                         class="text-brand-text-secondary hover:text-brand-text"
