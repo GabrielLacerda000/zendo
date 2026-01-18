@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import type { TodoList } from '@/types/List';
-import { getLists, saveLists, getActiveListId, saveActiveListId } from '@/shared/utils/store';
+import { TodoList } from '../../../types/List';
+// import { store } from '../../../shared/utils/store';
+// import type { TodoList } from '@/types/List';
+import { getLists, saveLists, getActiveListId, saveActiveListId } from '../../../shared/utils/store';
 
 export const useListStore = defineStore('lists', () => {
   // State

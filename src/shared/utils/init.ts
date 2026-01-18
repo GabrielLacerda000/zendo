@@ -1,5 +1,5 @@
-import { useListStore } from '@/modules/lists/stores/listStore';
-import { useTodoStore } from '@/modules/todos/stores/todoStore';
+import { useListStore } from "../../modules/lists/stores/listStore";
+import { useTodoStore } from "../../modules/todos/stores/todoStore";
 
 export async function initializeApp() {
   const listStore = useListStore();
