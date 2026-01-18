@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { Todo } from '@/types/Todo'
-import { computed } from 'vue'
-import { cn } from '@/shared/utils/cn'
+import { computed } from 'vue';
+import { useTodoStore } from '../../todos/stores/todoStore';
+import { cn } from '../../../shared/utils/cn';
+import { Todo } from '../../../types/Todo';
 
 interface Props {
   todo: Todo
@@ -9,19 +10,37 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const todoStore = useTodoStore()
 
 const completedChecklistCount = computed(() => {
   return props.todo.checklist.filter(item => item.completed).length
 })
+
+const handleDelete = (event: Event) => {
+  event.stopPropagation()
+  todoStore.deleteTodo(props.todo.id)
+}
 </script>
 
 <template>
   <div
     :class="cn(
-      'p-3 bg-brand-background border border-brand-border rounded-lg cursor-pointer hover:bg-brand-background-secondary transition-colors',
+      'group relative p-3 bg-brand-background border border-brand-border rounded-lg cursor-pointer hover:bg-brand-background-secondary transition-colors',
       props.class
     )"
   >
+    <!-- Delete button - appears on hover -->
+    <button
+      @click="handleDelete"
+      class="absolute top-2 right-2 p-1.5 bg-red-200 hover:bg-red-400 rounded opacity-0 group-hover:opacity-100 transition-opacity transition-colors z-10 cursor-pointer"
+      aria-label="Delete todo"
+    >
+      <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+
     <!-- Todo title -->
     <div class="text-brand-text">{{ todo.title }}</div>
 
