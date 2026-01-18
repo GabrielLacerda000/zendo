@@ -23,8 +23,8 @@ const handleChange = (event: Event) => {
       :value="modelValue"
       @change="handleChange"
       :class="[
-        'border border-brand-border rounded-2xl',
-        'px-6 py-4 text-gray-100',
+        'border border-brand-border rounded-xl',
+        'px-3 py-2 text-gray-200',
         'focus:border-emerald-400 focus:outline-none',
         'transition-colors duration-200',
         'appearance-none cursor-pointer',

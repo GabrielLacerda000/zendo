@@ -97,25 +97,38 @@ onMounted(async () => {
       />
       <button
         @click="handleCreateList"
-        class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 cursor-pointer"
+        class="px-3 py-2 bg-emerald-600 text-gray-200 rounded-xl hover:bg-emerald-700 cursor-pointer"
       >
         Add List
       </button>
     </div>
 
     <!-- Two-column lists section -->
-    <div class="grid grid-cols-2 gap-8">
-      <!-- Left list with todos -->
-      <ListContainer title="list title">
-        <TodoItem text="todo" />
-        <TodoItem text="todo" />
-        <TodoItem text="todo" />
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <ListContainer
+        v-for="list in listStore.sortedLists"
+        :key="list.id"
+        :title="list.name"
+      >
+        <TodoItem
+          v-for="todo in todoStore.todosByList(list.id)"
+          :key="todo.id"
+          :text="todo.title"
+        />
+        <div
+          v-if="todoStore.todosByList(list.id).length === 0"
+          class="text-brand-text-secondary text-sm"
+        >
+          No todos yet
+        </div>
       </ListContainer>
 
-      <!-- Right list with input -->
-      <ListContainer title="list title">
-        <BaseInput placeholder="" />
-      </ListContainer>
+      <div
+        v-if="listStore.sortedLists.length === 0"
+        class="col-span-2 text-center text-brand-text-secondary"
+      >
+        No lists yet. Click "Add List" to get started.
+      </div>
     </div>
   </div>
 </template>

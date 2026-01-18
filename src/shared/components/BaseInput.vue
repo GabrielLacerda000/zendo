@@ -24,8 +24,8 @@ const handleInput = (event: Event) => {
     @input="handleInput"
     :placeholder="placeholder"
     :class="[
-      'bg-brand border border-brand-border rounded-2xl',
-      'px-6 py-4 text-gray-200 placeholder:text-brand-secondary',
+      'bg-brand border border-brand-border rounded-xl',
+      'px-3 py-2 text-gray-200 placeholder:text-brand-secondary',
       'focus:border-emerald-400 focus:outline-none',
       'transition-colors duration-200',
       props.class
