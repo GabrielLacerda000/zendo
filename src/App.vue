@@ -113,6 +113,7 @@ onMounted(async () => {
         :options="listOptions"
         class="w-48"
       />
+      <Btn label="Add todo" @click="handleCreateTodo" />
       <Btn label="Add List" @click="handleCreateList" />
     </div>
 
