@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import type { Todo, ChecklistItem } from '@/types/Todo';
-import { getTodos, saveTodos } from '@/shared/utils/store';
+import { ChecklistItem, Todo } from '../../../types/Todo';
+import { getTodos, saveTodos } from '../../../shared/utils/store';
 
 export const useTodoStore = defineStore('todos', () => {
   // State
