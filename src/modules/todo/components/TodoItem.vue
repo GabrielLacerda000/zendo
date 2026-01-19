@@ -3,6 +3,7 @@ import { computed, ref, nextTick } from 'vue';
 import { useTodoStore } from '../../todos/stores/todoStore';
 import { cn } from '../../../shared/utils/cn';
 import { Todo } from '../../../types/Todo';
+import BaseInput from '../../../shared/components/BaseInput.vue';
 
 interface Props {
   todo: Todo
@@ -81,7 +82,7 @@ const cancelEditTitle = () => {
     >
       {{ todo.title }}
     </div>
-    <baseIpun
+    <BaseInput
       v-else
       ref="titleInputRef"
       v-model="localTitle"
