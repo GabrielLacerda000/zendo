@@ -12,11 +12,21 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "zendo",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "visible": false,
+        "skipTaskbar": true
       }
     ],
+    "trayIcon": {
+      "id": "main-tray",
+      "iconPath": "icons/32x32.png",
+      "iconAsTemplate": false,
+      "menuOnLeftClick": false,
+      "tooltip": "zendo - Todo Manager"
+    },
     "security": {
       "csp": null
     }

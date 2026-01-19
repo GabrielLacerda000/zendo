@@ -1,27 +1,35 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
+import tailwindcss from '@tailwindcss/vite';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 
-// @ts-expect-error process is a nodejs global
+// Emulação do __dirname para ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = resolve(__filename, '..');
+
 const host = process.env.TAURI_DEV_HOST;
 
-// https://vite.dev/config/
 export default defineConfig(async () => ({
   plugins: [vue(), tailwindcss()],
 
-  // Path alias configuration
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        'quick-add': resolve(__dirname, 'quick-add.html')
+      }
+    }
+  },
+
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      // Usando o resolve que importamos e a nossa nova constante __dirname
+      '@': resolve(__dirname, './src'),
     },
   },
 
-  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
-  //
-  // 1. prevent Vite from obscuring rust errors
   clearScreen: false,
-  // 2. tauri expects a fixed port, fail if that port is not available
   server: {
     port: 1420,
     strictPort: true,
@@ -34,7 +42,6 @@ export default defineConfig(async () => ({
         }
       : undefined,
     watch: {
-      // 3. tell Vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
     },
   },
