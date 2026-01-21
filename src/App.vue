@@ -5,6 +5,7 @@ import BaseSelect from './shared/components/BaseSelect.vue'
 import TodoItem from './modules/todo/components/TodoItem.vue'
 import ListContainer from './modules/list/components/ListContainer.vue'
 import TodoDetailModal from './shared/components/TodoDetailModal.vue'
+import ThemeToggle from './shared/components/ThemeToggle.vue'
 import { initializeApp } from './shared/utils/init'
 import { useListStore } from './modules/lists/stores/listStore'
 import { useTodoStore } from './modules/todos/stores/todoStore'
@@ -133,10 +134,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="isLoading" class="min-h-screen bg-brand-background flex items-center justify-center">
-    <div class="text-brand-text">Loading...</div>
+  <div v-if="isLoading" class="min-h-screen bg-gray-50 dark:bg-brand-background flex items-center justify-center">
+    <div class="text-gray-800 dark:text-gray-100">Loading...</div>
   </div>
-  <div v-else class="min-h-screen bg-brand-background p-8">
+  <div v-else class="min-h-screen bg-gray-50 dark:bg-brand-background p-8 relative transition-colors">
+    <!-- Theme toggle -->
+    <div class="absolute top-6 right-6 z-10">
+      <ThemeToggle />
+    </div>
+
     <!-- Top controls section -->
     <div class="flex gap-4 mb-8 items-start">
       <BaseInput
@@ -169,14 +175,15 @@ onMounted(async () => {
         :title="list.name"
       >
         <TodoItem
-          v-for="todo in todoStore.todosByList(list.id)"
+          v-for="(todo, index) in todoStore.todosByList(list.id)"
           :key="todo.id"
           :todo="todo"
+          :index="index"
           @click="openTodoModal(todo)"
         />
         <div
           v-if="todoStore.todosByList(list.id).length === 0"
-          class="text-brand-text-secondary text-sm"
+          class="text-gray-500 dark:text-gray-400 text-sm text-center py-4"
         >
           No todos yet
         </div>
@@ -184,7 +191,7 @@ onMounted(async () => {
 
       <div
         v-if="listStore.sortedLists.length === 0"
-        class="col-span-2 text-center text-brand-text-secondary"
+        class="col-span-full text-center text-gray-500 dark:text-gray-400 py-8"
       >
         No lists yet. Click "Add List" to get started.
       </div>

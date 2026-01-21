@@ -40,14 +40,17 @@ const handleInput = (event: Event) => {
       @input="handleInput"
       :placeholder="placeholder"
       :class="[
-        'w-full bg-brand rounded-xl px-3 py-2 text-gray-200 placeholder:text-brand-secondary',
+        'w-full rounded-xl px-3 py-2 transition-all duration-200',
+        'bg-white dark:bg-brand-background-secondary',
+        'text-gray-800 dark:text-gray-100',
+        'placeholder:text-gray-400 dark:placeholder:text-gray-500',
         props.isInvalid
-          ? 'border border-red-700 focus:border-red-700'
-          : 'border border-brand-border focus:border-emerald-400',
-        'focus:outline-none transition-colors duration-200'
+          ? 'border-2 border-red-500 dark:border-red-400 focus:border-red-600 dark:focus:border-red-300'
+          : 'border-2 border-gray-300 dark:border-brand-border focus:border-emerald-500 dark:focus:border-emerald-400',
+        'focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20'
       ]"
     />
-    <div v-if="error" class="text-red-600 text-sm mt-1">
+    <div v-if="error" class="text-red-600 dark:text-red-400 text-sm mt-1.5 ml-1">
       {{ error }}
     </div>
   </div>

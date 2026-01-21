@@ -1,9 +1,73 @@
+/* Light theme (default) */
 @theme {
-    /* backgrounds */
+  /* Primary Colors */
+  --color-primary: theme(colors.emerald.600);
+  --color-primary-hover: theme(colors.emerald.700);
+  --color-primary-disabled: theme(colors.emerald.400);
+
+  /* Backgrounds */
+  --color-background: theme(colors.gray.50);
+  --color-surface: theme(colors.white);
+  --color-surface-hover: theme(colors.gray.100);
+  --color-surface-tertiary: theme(colors.gray.200);
+
+  /* Borders */
+  --color-border: theme(colors.gray.300);
+  --color-border-focus: theme(colors.emerald.400);
+
+  /* Text */
+  --color-text-primary: theme(colors.gray.800);
+  --color-text-secondary: theme(colors.gray.500);
+  --color-text-disabled: theme(colors.gray.400);
+  --color-text-on-primary: theme(colors.white);
+
+  /* Accents */
+  --color-secondary: theme(colors.violet.500);
+  --color-success: theme(colors.emerald.500);
+  --color-warning: theme(colors.amber.500);
+  --color-error: theme(colors.red.500);
+
+  /* Legacy brand colors (for backward compatibility) */
+  --color-brand-background: theme(colors.gray.50);
+  --color-brand-background-secondary: theme(colors.white);
+  --color-brand-background-tertiary: theme(colors.gray.100);
+  --color-brand-border: theme(colors.gray.300);
+}
+
+/* Dark theme */
+.dark {
+  @theme {
+    /* Primary Colors - slightly brighter for dark bg */
+    --color-primary: theme(colors.emerald.500);
+    --color-primary-hover: theme(colors.emerald.600);
+    --color-primary-disabled: theme(colors.emerald.700);
+
+    /* Backgrounds */
+    --color-background: #121614;
+    --color-surface: #181E1B;
+    --color-surface-hover: #1F2723;
+    --color-surface-tertiary: #26312C;
+
+    /* Borders */
+    --color-border: #26312C;
+    --color-border-focus: theme(colors.emerald.500);
+
+    /* Text */
+    --color-text-primary: theme(colors.gray.100);
+    --color-text-secondary: theme(colors.gray.400);
+    --color-text-disabled: theme(colors.gray.600);
+    --color-text-on-primary: theme(colors.white);
+
+    /* Accents */
+    --color-secondary: theme(colors.violet.400);
+    --color-success: theme(colors.emerald.400);
+    --color-warning: theme(colors.amber.400);
+    --color-error: theme(colors.red.400);
+
+    /* Legacy brand colors (for backward compatibility) */
     --color-brand-background: #121614;
     --color-brand-background-secondary: #181E1B;
     --color-brand-background-tertiary: #1F2723;
-    
-    /* borders */
     --color-brand-border: #26312C;
+  }
 }
