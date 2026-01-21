@@ -5,6 +5,8 @@ interface Props {
   modelValue?: string
   placeholder?: string
   class?: any
+  isInvalid?: boolean
+  error?: string
 }
 
 const props = defineProps<Props>()
@@ -30,17 +32,23 @@ const handleInput = (event: Event) => {
 </script>
 
 <template>
-  <input
-    type="text"
-    :value="modelValue"
-    @input="handleInput"
-    :placeholder="placeholder"
-    :class="[
-      'bg-brand border border-brand-border rounded-xl',
-      'px-3 py-2 text-gray-200 placeholder:text-brand-secondary',
-      'focus:border-emerald-400 focus:outline-none',
-      'transition-colors duration-200',
-      props.class
-    ]"
-  />
+  <div :class="props.class">
+    <input
+      ref="inputRef"
+      type="text"
+      :value="modelValue"
+      @input="handleInput"
+      :placeholder="placeholder"
+      :class="[
+        'w-full bg-brand rounded-xl px-3 py-2 text-gray-200 placeholder:text-brand-secondary',
+        props.isInvalid
+          ? 'border border-red-700 focus:border-red-700'
+          : 'border border-brand-border focus:border-emerald-400',
+        'focus:outline-none transition-colors duration-200'
+      ]"
+    />
+    <div v-if="error" class="text-red-600 text-sm mt-1">
+      {{ error }}
+    </div>
+  </div>
 </template>

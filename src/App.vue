@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import BaseInput from './shared/components/BaseInput.vue'
 import BaseSelect from './shared/components/BaseSelect.vue'
 import TodoItem from './modules/todo/components/TodoItem.vue'
@@ -26,6 +26,10 @@ const todoInput = ref('')
 const priority = ref('low')
 const selectedList = ref('')
 
+// Validation error state
+const validationError = ref('')
+const isCreatingInvalidTodo = ref(false)
+
 const priorityOptions = [
   { value: 'low', label: 'low' },
   { value: 'medium', label: 'medium' },
@@ -39,10 +43,48 @@ const listOptions = computed(() =>
   }))
 )
 
+// Clear error when user types
+watch(todoInput, (newVal) => {
+  if (newVal.trim()) {
+    validationError.value = ''
+    isCreatingInvalidTodo.value = false
+  }
+})
+
+// Clear error when user selects list
+watch(selectedList, (newVal) => {
+  if (newVal) {
+    validationError.value = ''
+    isCreatingInvalidTodo.value = false
+  }
+})
+
 // Todo creation handler
 const handleCreateTodo = async () => {
-  if (!todoInput.value.trim() || !selectedList.value) return
+  // Clear previous errors
+  isCreatingInvalidTodo.value = false
+  validationError.value = ''
 
+  // Validate inputs
+  if (!todoInput.value.trim() && !selectedList.value) {
+    validationError.value = 'Enter todo title and select a list'
+    isCreatingInvalidTodo.value = true
+    return
+  }
+
+  if (!todoInput.value.trim()) {
+    validationError.value = 'Enter a todo title'
+    isCreatingInvalidTodo.value = true
+    return
+  }
+
+  if (!selectedList.value) {
+    validationError.value = 'Select a list'
+    isCreatingInvalidTodo.value = true
+    return
+  }
+
+  // Validation passed - create todo
   await todoStore.createTodo({
     title: todoInput.value,
     priority: priority.value as 'low' | 'medium' | 'high',
@@ -96,11 +138,13 @@ onMounted(async () => {
   </div>
   <div v-else class="min-h-screen bg-brand-background p-8">
     <!-- Top controls section -->
-    <div class="flex gap-4 mb-8 items-center">
+    <div class="flex gap-4 mb-8 items-start">
       <BaseInput
         v-model="todoInput"
         placeholder="placeholder"
         class="flex-1"
+        :isInvalid="isCreatingInvalidTodo"
+        :error="validationError"
         @keyup.enter="handleCreateTodo"
       />
       <BaseSelect
