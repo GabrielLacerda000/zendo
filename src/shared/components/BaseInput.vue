@@ -1,11 +1,23 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 interface Props {
   modelValue?: string
   placeholder?: string
-  class?: string
+  class?: any
 }
 
 const props = defineProps<Props>()
+
+const inputRef = ref<HTMLInputElement | null>(null);
+
+const focus = () => {
+  inputRef.value?.focus();
+};
+
+defineExpose({
+  focus
+});
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]

@@ -14,6 +14,8 @@ const emit = defineEmits<{
     close: [];
 }>();
 
+
+
 const todoStore = useTodoStore();
 
 // Local state for title editing
