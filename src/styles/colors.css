@@ -32,6 +32,22 @@
   --color-brand-background-secondary: theme(colors.white);
   --color-brand-background-tertiary: theme(colors.gray.100);
   --color-brand-border: theme(colors.gray.300);
+
+  /* Sidebar */
+  --color-sidebar-bg: theme(colors.gray.100);
+  --color-sidebar-text: theme(colors.gray.800);
+  --color-sidebar-item-hover: theme(colors.gray.200);
+  --color-sidebar-item-active: theme(colors.emerald.50);
+  --color-sidebar-border: theme(colors.gray.300);
+
+  /* Main content */
+  --color-main-bg: theme(colors.gray.50);
+  --color-card-bg: theme(colors.white);
+  --color-card-border: theme(colors.gray.200);
+
+  /* Progress bar */
+  --color-progress-bg: theme(colors.gray.200);
+  --color-progress-fill: theme(colors.emerald.600);
 }
 
 /* Dark theme */
@@ -69,5 +85,21 @@
     --color-brand-background-secondary: #181E1B;
     --color-brand-background-tertiary: #1F2723;
     --color-brand-border: #26312C;
+
+    /* Sidebar */
+    --color-sidebar-bg: #0F1311;
+    --color-sidebar-text: theme(colors.gray.100);
+    --color-sidebar-item-hover: #1A221E;
+    --color-sidebar-item-active: rgb(6 78 59 / 0.3);
+    --color-sidebar-border: #26312C;
+
+    /* Main content */
+    --color-main-bg: #121614;
+    --color-card-bg: #181E1B;
+    --color-card-border: #26312C;
+
+    /* Progress bar */
+    --color-progress-bg: #26312C;
+    --color-progress-fill: theme(colors.emerald.500);
   }
 }

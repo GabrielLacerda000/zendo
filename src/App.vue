@@ -1,19 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import BaseInput from './shared/components/BaseInput.vue'
-import BaseSelect from './shared/components/BaseSelect.vue'
-import TodoItem from './modules/todo/components/TodoItem.vue'
-import ListContainer from './modules/list/components/ListContainer.vue'
+import { ref, onMounted } from 'vue'
+import Sidebar from './shared/components/Sidebar.vue'
+import MainContent from './shared/components/MainContent.vue'
 import TodoDetailModal from './shared/components/TodoDetailModal.vue'
 import ThemeToggle from './shared/components/ThemeToggle.vue'
 import { initializeApp } from './shared/utils/init'
 import { useListStore } from './modules/lists/stores/listStore'
-import { useTodoStore } from './modules/todos/stores/todoStore'
-import Btn from './shared/components/Btn.vue'
-import { Todo } from './types/Todo'
-
-const listStore = useListStore()
-const todoStore = useTodoStore()
+import type { Todo } from './types/Todo'
 
 // App initialization state
 const isLoading = ref(true)
@@ -21,92 +14,6 @@ const isLoading = ref(true)
 // Modal state
 const selectedTodo = ref<Todo | null>(null)
 const isTodoModalOpen = ref(false)
-
-// Static prototype - refs not really used but show v-model structure
-const todoInput = ref('')
-const priority = ref('low')
-const selectedList = ref('')
-
-// Validation error state
-const validationError = ref('')
-const isCreatingInvalidTodo = ref(false)
-
-const priorityOptions = [
-  { value: 'low', label: 'low' },
-  { value: 'medium', label: 'medium' },
-  { value: 'high', label: 'high' }
-]
-
-const listOptions = computed(() =>
-  listStore.sortedLists.map(list => ({
-    value: list.id,
-    label: list.name
-  }))
-)
-
-// Clear error when user types
-watch(todoInput, (newVal) => {
-  if (newVal.trim()) {
-    validationError.value = ''
-    isCreatingInvalidTodo.value = false
-  }
-})
-
-// Clear error when user selects list
-watch(selectedList, (newVal) => {
-  if (newVal) {
-    validationError.value = ''
-    isCreatingInvalidTodo.value = false
-  }
-})
-
-// Todo creation handler
-const handleCreateTodo = async () => {
-  // Clear previous errors
-  isCreatingInvalidTodo.value = false
-  validationError.value = ''
-
-  // Validate inputs
-  if (!todoInput.value.trim() && !selectedList.value) {
-    validationError.value = 'Enter todo title and select a list'
-    isCreatingInvalidTodo.value = true
-    return
-  }
-
-  if (!todoInput.value.trim()) {
-    validationError.value = 'Enter a todo title'
-    isCreatingInvalidTodo.value = true
-    return
-  }
-
-  if (!selectedList.value) {
-    validationError.value = 'Select a list'
-    isCreatingInvalidTodo.value = true
-    return
-  }
-
-  // Validation passed - create todo
-  await todoStore.createTodo({
-    title: todoInput.value,
-    priority: priority.value as 'low' | 'medium' | 'high',
-    listId: selectedList.value,
-    completed: false,
-    checklist: [],
-    description: ''
-  })
-
-  todoInput.value = ''
-}
-
-// List creation handler
-const handleCreateList = async () => {
-  const listName = prompt('Enter new list name:')
-  if (!listName?.trim()) return
-
-  const newList = await listStore.createList(listName)
-  // Optionally set as selected
-  selectedList.value = newList.id
-}
 
 // Modal handlers
 const openTodoModal = (todo: Todo) => {
@@ -123,8 +30,6 @@ const closeTodoModal = () => {
 onMounted(async () => {
   try {
     await initializeApp()
-    // Set the initial selected list to the active one
-    selectedList.value = listStore.activeListId || ''
   } catch (error) {
     console.error('Failed to initialize app:', error)
   } finally {
@@ -134,68 +39,20 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="isLoading" class="min-h-screen bg-gray-50 dark:bg-brand-background flex items-center justify-center">
+  <div v-if="isLoading" class="h-screen `bg-(--color-main-bg)flex items-center justify-center">
     <div class="text-gray-800 dark:text-gray-100">Loading...</div>
   </div>
-  <div v-else class="min-h-screen bg-gray-50 dark:bg-brand-background p-8 relative transition-colors">
+  <div v-else class="flex h-screen `bg-(--color-main-bg)relative transition-colors">
     <!-- Theme toggle -->
     <div class="absolute top-6 right-6 z-10">
       <ThemeToggle />
     </div>
 
-    <!-- Top controls section -->
-    <div class="flex gap-4 mb-8 items-start">
-      <BaseInput
-        v-model="todoInput"
-        placeholder="placeholder"
-        class="flex-1"
-        :isInvalid="isCreatingInvalidTodo"
-        :error="validationError"
-        @keyup.enter="handleCreateTodo"
-      />
-      <BaseSelect
-        v-model="priority"
-        :options="priorityOptions"
-        class="w-48"
-      />
-      <BaseSelect
-        v-model="selectedList"
-        :options="listOptions"
-        class="w-48"
-      />
-      <Btn label="Add todo" @click="handleCreateTodo" />
-      <Btn label="Add List" @click="handleCreateList" />
-    </div>
+    <!-- Sidebar -->
+    <Sidebar />
 
-    <!-- Two-column lists section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      <ListContainer
-        v-for="list in listStore.sortedLists"
-        :key="list.id"
-        :title="list.name"
-      >
-        <TodoItem
-          v-for="(todo, index) in todoStore.todosByList(list.id)"
-          :key="todo.id"
-          :todo="todo"
-          :index="index"
-          @click="openTodoModal(todo)"
-        />
-        <div
-          v-if="todoStore.todosByList(list.id).length === 0"
-          class="text-gray-500 dark:text-gray-400 text-sm text-center py-4"
-        >
-          No todos yet
-        </div>
-      </ListContainer>
-
-      <div
-        v-if="listStore.sortedLists.length === 0"
-        class="col-span-full text-center text-gray-500 dark:text-gray-400 py-8"
-      >
-        No lists yet. Click "Add List" to get started.
-      </div>
-    </div>
+    <!-- Main Content -->
+    <MainContent @openTodoModal="openTodoModal" />
 
     <!-- Todo Detail Modal -->
     <TodoDetailModal
