@@ -70,7 +70,7 @@ const openTodoModal = (todo: Todo) => {
       </div>
 
       <!-- Add Todo Section (bottom) -->
-      <div class="mt-8 sticky bottom-0 bg-[var(--color-main-bg)] py-4">
+      <div class="mt-8 sticky bottom-0 bg-(--color-main-bg) py-4">
         <AddTodoInput />
       </div>
     </div>
