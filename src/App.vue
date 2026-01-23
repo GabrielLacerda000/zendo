@@ -39,14 +39,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="isLoading" class="h-screen `bg-(--color-main-bg)flex items-center justify-center">
+  <div v-if="isLoading" class="h-screen `bg-(--color-main-bg) flex items-center justify-center">
     <div class="text-gray-800 dark:text-gray-100">Loading...</div>
   </div>
-  <div v-else class="flex h-screen `bg-(--color-main-bg)relative transition-colors">
+  <div v-else class="flex h-screen `bg-(--color-main-bg) relative transition-colors">
     <!-- Theme toggle -->
-    <div class="absolute top-6 right-6 z-10">
+    <!-- <div class="absolute top-6 right-6 z-10">
       <ThemeToggle />
-    </div>
+    </div> -->
 
     <!-- Sidebar -->
     <Sidebar />

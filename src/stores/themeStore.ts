@@ -6,14 +6,14 @@ export type Theme = 'light' | 'dark';
 const THEME_STORAGE_KEY = 'zendo-theme';
 
 export const useThemeStore = defineStore('theme', () => {
-  // Initialize theme from localStorage or system preference
+
   const getInitialTheme = (): Theme => {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') {
       return stored;
     }
 
-    // Check system preference
+
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }
@@ -23,7 +23,6 @@ export const useThemeStore = defineStore('theme', () => {
 
   const theme = ref<Theme>(getInitialTheme());
 
-  // Apply theme class to document
   const applyTheme = (newTheme: Theme) => {
     if (newTheme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -32,10 +31,9 @@ export const useThemeStore = defineStore('theme', () => {
     }
   };
 
-  // Apply initial theme
   applyTheme(theme.value);
 
-  // Watch for theme changes and persist
+
   watch(theme, (newTheme) => {
     applyTheme(newTheme);
     localStorage.setItem(THEME_STORAGE_KEY, newTheme);

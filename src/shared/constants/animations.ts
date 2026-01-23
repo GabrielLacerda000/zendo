@@ -37,6 +37,12 @@ export const VARIANTS = {
   },
   cardHover: {
     whileHover: { y: -2, scale: 1.01 }
+  },
+  slideOutLeft: {
+    exit: { opacity: 0, x: -20, scale: 0.95 }
+  },
+  scaleOut: {
+    exit: { opacity: 0, scale: 0.9, y: 10 }
   }
 } as const;
 

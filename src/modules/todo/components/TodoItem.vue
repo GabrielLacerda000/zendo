@@ -23,14 +23,25 @@ const todoStore = useTodoStore()
 const isEditingTitle = ref(false)
 const localTitle = ref(props.todo.title)
 const titleInputRef = ref<InstanceType<typeof BaseInput> | null>(null)
+const isDeleting = ref(false)
 
 const completedChecklistCount = computed(() => {
   return props.todo.checklist.filter(item => item.completed).length
 })
 
+const animateState = computed(() => {
+  if (isDeleting.value) {
+    return { opacity: 0, scale: 0.9, y: 10 }
+  }
+  return { opacity: 1, x: 0 }
+})
+
 const handleDelete = (event: Event) => {
   event.stopPropagation()
-  todoStore.deleteTodo(props.todo.id)
+  isDeleting.value = true
+  setTimeout(() => {
+    todoStore.deleteTodo(props.todo.id)
+  }, 200)
 }
 
 // Title editing methods
@@ -63,13 +74,14 @@ const cancelEditTitle = () => {
 <template>
   <Motion
     :initial="{ opacity: 0, x: -20 }"
-    :animate="{ opacity: 1, x: 0 }"
-    :whileHover="{ y: -2, scale: 1.01 }"
+    :animate="animateState"
+    :whileHover="!isDeleting && { y: -2, scale: 1.01 }"
     :transition="{
-      type: 'spring',
+      duration: isDeleting ? 0.2 : undefined,
+      type: isDeleting ? undefined : 'spring',
       stiffness: 260,
       damping: 20,
-      delay: props.index * STAGGER_DELAY
+      delay: isDeleting ? 0 : props.index * STAGGER_DELAY
     }"
   >
     <div

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Motion } from 'motion-v'
 import { AlignLeft, CheckSquare, Trash2 } from 'lucide-vue-next'
 import CircularCheckbox from './CircularCheckbox.vue'
@@ -16,8 +16,17 @@ const props = defineProps<Props>()
 const emit = defineEmits<{ click: [] }>()
 const todoStore = useTodoStore()
 
+const isDeleting = ref(false)
+
 const checklistCompleted = computed(() => {
   return props.todo.checklist.filter(item => item.completed).length
+})
+
+const animateState = computed(() => {
+  if (isDeleting.value) {
+    return { opacity: 0, x: -20, scale: 0.95 }
+  }
+  return { opacity: 1, y: 0 }
 })
 
 const handleToggle = async () => {
@@ -26,17 +35,21 @@ const handleToggle = async () => {
   })
 }
 
-const handleDelete = async () => {
-  await todoStore.deleteTodo(props.todo.id)
+const handleDelete = () => {
+  isDeleting.value = true
+  // Actual deletion happens after a short delay to allow animation
+  setTimeout(async () => {
+    await todoStore.deleteTodo(props.todo.id)
+  }, 200) // Match TRANSITIONS.FAST duration
 }
 </script>
 
 <template>
   <Motion
     :initial="{ opacity: 0, y: 10 }"
-    :animate="{ opacity: 1, y: 0 }"
-    :whileHover="{ scale: 1.01 }"
-    :transition="{ ...SPRINGS.DEFAULT, delay: index * STAGGER_DELAY }"
+    :animate="animateState"
+    :whileHover="!isDeleting && { scale: 1.01 }"
+    :transition="{ duration: 0.2, delay: isDeleting ? 0 : index * STAGGER_DELAY }"
   >
     <div
       @click="emit('click')"
@@ -76,7 +89,7 @@ const handleDelete = async () => {
       <!-- Delete Button (on hover) -->
       <button
         @click.stop="handleDelete"
-        class="opacity-0 group-hover:opacity-100 transition-opacity"
+        class="opacity-0 group-hover:opacity-100 transition-opacity self-center"
       >
         <Trash2 class="w-4 h-4 text-red-500 hover:text-red-600" />
       </button>

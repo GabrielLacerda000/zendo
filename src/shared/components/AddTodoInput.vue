@@ -53,7 +53,7 @@ const handleCreate = async () => {
 
     <button
       @click="handleCreate"
-      class="p-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors"
+      class="p-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors cursor-pointer"
     >
       <Plus class="w-5 h-5 text-white" />
     </button>
