@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Motion } from 'motion-v'
+import { Trash2 } from 'lucide-vue-next'
 import { SPRINGS, STAGGER_DELAY } from '../constants/animations'
 import { useListStore } from '../../modules/lists/stores/listStore'
 import { useTodoStore } from '../../modules/todos/stores/todoStore'
@@ -16,32 +17,68 @@ const props = defineProps<Props>()
 const listStore = useListStore()
 const todoStore = useTodoStore()
 
+const isDeleting = ref(false)
+
 const todoCount = computed(() => {
   return todoStore.todosByList(props.list.id).length
 })
 
+const animateState = computed(() => {
+  if (isDeleting.value) {
+    return { opacity: 0, scale: 0.95, x: -10 }
+  }
+  return { opacity: 1, x: 0 }
+})
+
 const handleClick = () => {
   listStore.setActiveList(props.list.id)
+}
+
+const handleDelete = (event: Event) => {
+  event.stopPropagation()
+  const todoCountText = todoCount.value === 1 ? '1 todo' : `${todoCount.value} todos`
+  if (confirm(`Delete "${props.list.name}" with ${todoCountText}?`)) {
+    isDeleting.value = true
+    setTimeout(async () => {
+      await listStore.deleteList(props.list.id)
+    }, 200)
+  }
 }
 </script>
 
 <template>
   <Motion
     :initial="{ opacity: 0, x: -10 }"
-    :animate="{ opacity: 1, x: 0 }"
-    :transition="{ ...SPRINGS.DEFAULT, delay: index * STAGGER_DELAY }"
+    :animate="animateState"
+    :transition="{
+      duration: isDeleting ? 0.2 : undefined,
+      type: isDeleting ? undefined : 'spring',
+      ...(!isDeleting && SPRINGS.DEFAULT),
+      delay: isDeleting ? 0 : index * STAGGER_DELAY
+    }"
   >
-    <button
-      @click="handleClick"
-      :class="[
-        'w-full px-3 py-2 rounded-lg text-left transition-all',
-        isActive
-          ? 'bg-[var(--color-sidebar-item-active)] text-emerald-700 dark:text-emerald-400 font-medium'
-          : 'hover:bg-[var(--color-sidebar-item-hover)] text-gray-700 dark:text-gray-300'
-      ]"
-    >
-      {{ list.name }}
-      <span class="text-xs ml-2 opacity-70">({{ todoCount }})</span>
-    </button>
+    <div class="group flex items-center gap-1 w-full">
+      <button
+        @click="handleClick"
+        :class="[
+          'flex-1 px-3 py-2 rounded-lg text-left transition-all',
+          isActive
+            ? 'bg-[var(--color-sidebar-item-active)] text-emerald-700 dark:text-emerald-400 font-medium'
+            : 'hover:bg-[var(--color-sidebar-item-hover)] text-gray-700 dark:text-gray-300'
+        ]"
+      >
+        {{ list.name }}
+        <span class="text-xs ml-2 opacity-70">({{ todoCount }})</span>
+      </button>
+
+      <!-- Delete button (appears on hover) -->
+      <button
+        @click="handleDelete"
+        class="opacity-0 group-hover:opacity-100 transition-opacity self-center p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+        aria-label="Delete list"
+      >
+        <Trash2 class="w-4 h-4 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300" />
+      </button>
+    </div>
   </Motion>
 </template>
