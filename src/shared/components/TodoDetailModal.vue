@@ -105,9 +105,10 @@ const cancelEditTitle = () => {
                     :animate="{ opacity: 1, scale: 1, y: 0 }"
                     :exit="{ opacity: 0, scale: 0.95, y: 20 }"
                     :transition="{ type: 'spring', stiffness: 300, damping: 25 }"
+                    class="w-full max-w-4xl"
                 >
                     <div
-                        class="bg-white dark:bg-brand-background-secondary border border-gray-200 dark:border-brand-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+                        class="bg-white dark:bg-brand-background-secondary border border-gray-200 dark:border-brand-border rounded-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
                     >
                         <!-- Header -->
                         <div class="p-6 border-b border-gray-200 dark:border-brand-border">
