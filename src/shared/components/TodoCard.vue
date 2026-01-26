@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Motion } from 'motion-v'
-import { AlignLeft, CheckSquare, Trash2 } from 'lucide-vue-next'
+import { AlignLeft, CheckSquare, Trash2, GripVertical } from 'lucide-vue-next'
 import CircularCheckbox from './CircularCheckbox.vue'
 import { SPRINGS, STAGGER_DELAY } from '../constants/animations'
 import { useTodoStore } from '../../modules/todos/stores/todoStore'
@@ -59,6 +59,11 @@ const handleDelete = () => {
         'transition-all cursor-pointer'
       ]"
     >
+      <!-- Drag Handle -->
+      <div class="drag-handle cursor-grab active:cursor-grabbing self-center mr-1" @click.stop>
+        <GripVertical class="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+
       <!-- Circular Checkbox -->
       <div @click.stop>
         <CircularCheckbox

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import draggable from 'vuedraggable'
 import ListHeader from './ListHeader.vue'
 import TodoCard from './TodoCard.vue'
 import AddTodoInput from './AddTodoInput.vue'
@@ -17,6 +18,15 @@ const activeList = computed(() => listStore.activeList)
 const activeTodos = computed(() => {
   if (!listStore.activeListId) return []
   return todoStore.todosByList(listStore.activeListId)
+})
+
+const dragTodos = computed({
+  get: () => activeTodos.value,
+  set: (value: Todo[]) => {
+    if (listStore.activeListId) {
+      todoStore.reorderTodos(listStore.activeListId, value)
+    }
+  }
 })
 
 const completedCount = computed(() => {
@@ -55,14 +65,23 @@ const openTodoModal = (todo: Todo) => {
       />
 
       <!-- Todos Section -->
-      <div class="space-y-3 mt-8">
-        <TodoCard
-          v-for="(todo, index) in activeTodos"
-          :key="todo.id"
-          :todo="todo"
-          :index="index"
-          @click="openTodoModal(todo)"
-        />
+      <div class="mt-8">
+        <draggable
+          v-model="dragTodos"
+          item-key="id"
+          handle=".drag-handle"
+          :animation="200"
+          ghost-class="opacity-50"
+          class="space-y-3"
+        >
+          <template #item="{ element, index }">
+            <TodoCard
+              :todo="element"
+              :index="index"
+              @click="openTodoModal(element)"
+            />
+          </template>
+        </draggable>
 
         <div v-if="activeTodos.length === 0" class="text-center py-8">
           <p class="text-gray-500 dark:text-gray-400">No todos yet</p>
