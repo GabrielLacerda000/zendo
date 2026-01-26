@@ -6,6 +6,7 @@ import { SPRINGS, STAGGER_DELAY } from '../constants/animations'
 import { useListStore } from '../../modules/lists/stores/listStore'
 import { useTodoStore } from '../../modules/todos/stores/todoStore'
 import type { TodoList } from '../../types/List'
+import ConfirmModal from './ConfirmModal.vue'
 
 interface Props {
   list: TodoList
@@ -18,9 +19,15 @@ const listStore = useListStore()
 const todoStore = useTodoStore()
 
 const isDeleting = ref(false)
+const showDeleteModal = ref(false)
 
 const todoCount = computed(() => {
   return todoStore.todosByList(props.list.id).length
+})
+
+const deleteMessage = computed(() => {
+  const todoCountText = todoCount.value === 1 ? '1 todo' : `${todoCount.value} todos`
+  return `Are you sure you want to delete "${props.list.name}" with ${todoCountText}?`
 })
 
 const animateState = computed(() => {
@@ -34,15 +41,21 @@ const handleClick = () => {
   listStore.setActiveList(props.list.id)
 }
 
-const handleDelete = (event: Event) => {
+const handleDeleteClick = (event: Event) => {
   event.stopPropagation()
-  const todoCountText = todoCount.value === 1 ? '1 todo' : `${todoCount.value} todos`
-  if (confirm(`Delete "${props.list.name}" with ${todoCountText}?`)) {
-    isDeleting.value = true
-    setTimeout(async () => {
-      await listStore.deleteList(props.list.id)
-    }, 200)
-  }
+  showDeleteModal.value = true
+}
+
+const handleConfirmDelete = () => {
+  showDeleteModal.value = false
+  isDeleting.value = true
+  setTimeout(async () => {
+    await listStore.deleteList(props.list.id)
+  }, 200)
+}
+
+const handleCancelDelete = () => {
+  showDeleteModal.value = false
 }
 </script>
 
@@ -73,7 +86,7 @@ const handleDelete = (event: Event) => {
 
       <!-- Delete button (appears on hover) -->
       <button
-        @click="handleDelete"
+        @click="handleDeleteClick"
         class="opacity-0 group-hover:opacity-100 transition-opacity self-center p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
         aria-label="Delete list"
       >
@@ -81,4 +94,16 @@ const handleDelete = (event: Event) => {
       </button>
     </div>
   </Motion>
+
+  <!-- Delete confirmation modal -->
+  <ConfirmModal
+    :is-open="showDeleteModal"
+    title="Delete List"
+    :message="deleteMessage"
+    confirm-text="Delete"
+    cancel-text="Cancel"
+    variant="danger"
+    @confirm="handleConfirmDelete"
+    @cancel="handleCancelDelete"
+  />
 </template>
