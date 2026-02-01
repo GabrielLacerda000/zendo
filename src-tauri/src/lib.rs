@@ -14,6 +14,19 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations(
+                    "sqlite:zendo.db",
+                    vec![tauri_plugin_sql::Migration {
+                        version: 1,
+                        description: "Initial schema",
+                        sql: include_str!("../migrations/001_initial_schema.sql"),
+                        kind: tauri_plugin_sql::MigrationKind::Up,
+                    }],
+                )
+                .build(),
+        )
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             /* =========================

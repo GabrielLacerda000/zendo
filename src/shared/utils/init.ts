@@ -1,7 +1,11 @@
 import { useListStore } from "../../modules/lists/stores/listStore";
 import { useTodoStore } from "../../modules/todos/stores/todoStore";
+import { getDatabase } from "../database/connection";
 
 export async function initializeApp() {
+  // Initialize database connection first
+  await getDatabase();
+
   const listStore = useListStore();
   const todoStore = useTodoStore();
 
@@ -18,10 +22,4 @@ export async function initializeApp() {
   if (!listStore.activeListId && listStore.lists.length > 0) {
     await listStore.setActiveList(listStore.lists[0].id);
   }
-}
-
-// Future migration function (for SQLite migration)
-export async function migrateData() {
-  // Placeholder for future JSON -> SQLite migration
-  // Will be implemented when migrating to SQLite
 }
