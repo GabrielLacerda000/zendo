@@ -32,7 +32,7 @@ const handleCreateList = async () => {
     <div class="p-6 border-b border-[var(--color-sidebar-border)]">
       <div class="flex items-center gap-2">
         <CheckSquare class="w-6 h-6 text-emerald-600 dark:text-emerald-500" />
-        <h1 class="text-xl font-bold text-[var(--color-sidebar-text)]">EmeraldTask</h1>
+        <h1 class="text-xl font-bold text-[var(--color-sidebar-text)]">Zendo</h1>
       </div>
     </div>
 
@@ -69,7 +69,7 @@ const handleCreateList = async () => {
         />
         <button
           @click="handleCreateList"
-          class="p-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+          class="p-2 rounded-full transition-colors duration-300 cursor-pointer hover:bg-emerald-400"
         >
           <Plus class="w-5 h-5 text-white" />
         </button>

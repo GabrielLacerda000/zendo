@@ -87,7 +87,7 @@ const handleCancelDelete = () => {
       <!-- Delete button (appears on hover) -->
       <button
         @click="handleDeleteClick"
-        class="opacity-0 group-hover:opacity-100 transition-opacity self-center p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+        class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 self-center p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer"
         aria-label="Delete list"
       >
         <Trash2 class="w-4 h-4 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300" />
