@@ -69,7 +69,7 @@ const handleCreateList = async () => {
         />
         <button
           @click="handleCreateList"
-          class="p-2 rounded-full transition-colors duration-300 cursor-pointer hover:bg-emerald-400"
+          class="p-2 rounded-lg transition-colors duration-300 cursor-pointer hover:bg-emerald-400"
         >
           <Plus class="w-5 h-5 text-white" />
         </button>
