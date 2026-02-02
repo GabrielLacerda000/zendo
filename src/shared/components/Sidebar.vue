@@ -51,6 +51,9 @@ const handleCreateList = async () => {
                 >
                     <span className="text-white font-black text-xl">Z</span>
                 </div>
+                <h1 className="text-xl font-bold text-[var(--color-sidebar-text)]">
+                    Zendo
+                </h1>
             </div>
         </div>
 
