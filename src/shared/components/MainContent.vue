@@ -45,6 +45,12 @@ const completionPercentage = computed(() => {
 const openTodoModal = (todo: Todo) => {
   emit('openTodoModal', todo)
 }
+
+const handleUpdateListName = async (newName: string) => {
+  if (activeList.value) {
+    await listStore.updateList(activeList.value.id, { name: newName })
+  }
+}
 </script>
 
 <template>
@@ -62,6 +68,7 @@ const openTodoModal = (todo: Todo) => {
         :completedCount="completedCount"
         :totalCount="totalCount"
         :completionPercentage="completionPercentage"
+        @update:listName="handleUpdateListName"
       />
 
       <!-- Todos Section -->
