@@ -2,11 +2,11 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { TodoList } from '../../../types/List';
-// import { store } from '../../../shared/utils/store';
-// import type { TodoList } from '@/types/List';
-import { getLists, saveLists, getActiveListId, saveActiveListId } from '../../../shared/utils/store';
+import { useDatabase } from '../../../shared/composables/useDatabase';
 
 export const useListStore = defineStore('lists', () => {
+  const db = useDatabase();
+
   // State
   const lists = ref<TodoList[]>([]);
   const activeListId = ref<string | null>(null);
@@ -23,8 +23,8 @@ export const useListStore = defineStore('lists', () => {
 
   // Actions
   async function loadLists() {
-    lists.value = await getLists();
-    activeListId.value = await getActiveListId();
+    lists.value = await db.lists.getAll();
+    activeListId.value = await db.settings.getActiveListId();
   }
 
   async function createList(name: string) {
@@ -34,8 +34,8 @@ export const useListStore = defineStore('lists', () => {
       order: lists.value.length,
     };
 
+    await db.lists.create(newList);
     lists.value.push(newList);
-    await saveLists(lists.value);
 
     // Set as active if it's the first list
     if (lists.value.length === 1) {
@@ -49,22 +49,23 @@ export const useListStore = defineStore('lists', () => {
     const index = lists.value.findIndex(list => list.id === id);
     if (index === -1) return;
 
+    await db.lists.update(id, updates);
     lists.value[index] = { ...lists.value[index], ...updates };
-    await saveLists(lists.value);
   }
 
   async function deleteList(id: string) {
     const index = lists.value.findIndex(list => list.id === id);
     if (index === -1) return;
 
+    await db.lists.delete(id);
     lists.value.splice(index, 1);
 
     // Reorder remaining lists
-    lists.value.forEach((list, idx) => {
+    const reorders = lists.value.map((list, idx) => {
       list.order = idx;
+      return { id: list.id, order: idx };
     });
-
-    await saveLists(lists.value);
+    await db.lists.updateOrders(reorders);
 
     // If deleted list was active, set first list as active
     if (activeListId.value === id) {
@@ -74,16 +75,17 @@ export const useListStore = defineStore('lists', () => {
   }
 
   async function reorderLists(reorderedLists: TodoList[]) {
-    reorderedLists.forEach((list, idx) => {
+    const reorders = reorderedLists.map((list, idx) => {
       list.order = idx;
+      return { id: list.id, order: idx };
     });
+    await db.lists.updateOrders(reorders);
     lists.value = reorderedLists;
-    await saveLists(lists.value);
   }
 
   async function setActiveList(listId: string | null) {
     activeListId.value = listId;
-    await saveActiveListId(listId);
+    await db.settings.setActiveListId(listId);
   }
 
   return {

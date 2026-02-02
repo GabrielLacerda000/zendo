@@ -6,6 +6,7 @@ import TodoCard from './TodoCard.vue'
 import AddTodoInput from './AddTodoInput.vue'
 import { useListStore } from '../../modules/lists/stores/listStore'
 import { useTodoStore } from '../../modules/todos/stores/todoStore'
+import { notify } from '../utils/toast'
 import type { Todo } from '../../types/Todo'
 
 const emit = defineEmits<{ openTodoModal: [todo: Todo] }>()
@@ -45,6 +46,13 @@ const completionPercentage = computed(() => {
 const openTodoModal = (todo: Todo) => {
   emit('openTodoModal', todo)
 }
+
+const handleUpdateListName = async (newName: string) => {
+  if (activeList.value) {
+    await listStore.updateList(activeList.value.id, { name: newName })
+    notify.success('List renamed')
+  }
+}
 </script>
 
 <template>
@@ -62,6 +70,7 @@ const openTodoModal = (todo: Todo) => {
         :completedCount="completedCount"
         :totalCount="totalCount"
         :completionPercentage="completionPercentage"
+        @update:listName="handleUpdateListName"
       />
 
       <!-- Todos Section -->

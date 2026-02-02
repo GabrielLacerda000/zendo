@@ -2,9 +2,11 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { ChecklistItem, Todo } from '../../../types/Todo';
-import { getTodos, saveTodos } from '../../../shared/utils/store';
+import { useDatabase } from '../../../shared/composables/useDatabase';
 
 export const useTodoStore = defineStore('todos', () => {
+  const db = useDatabase();
+
   // State
   const todos = ref<Todo[]>([]);
 
@@ -27,7 +29,7 @@ export const useTodoStore = defineStore('todos', () => {
 
   // Actions
   async function loadTodos() {
-    todos.value = await getTodos();
+    todos.value = await db.todos.getAll();
   }
 
   async function createTodo(todoData: Omit<Todo, 'id' | 'createdAt' | 'updatedAt' | 'order'>) {
@@ -41,8 +43,8 @@ export const useTodoStore = defineStore('todos', () => {
       updatedAt: Date.now(),
     };
 
+    await db.todos.create(newTodo);
     todos.value.push(newTodo);
-    await saveTodos(todos.value);
 
     return newTodo;
   }
@@ -51,13 +53,14 @@ export const useTodoStore = defineStore('todos', () => {
     const index = todos.value.findIndex(todo => todo.id === id);
     if (index === -1) return;
 
+    const updatedAt = Date.now();
+    await db.todos.update(id, { ...updates, updatedAt });
+
     todos.value[index] = {
       ...todos.value[index],
       ...updates,
-      updatedAt: Date.now(),
+      updatedAt,
     };
-
-    await saveTodos(todos.value);
   }
 
   async function deleteTodo(id: string) {
@@ -66,41 +69,49 @@ export const useTodoStore = defineStore('todos', () => {
 
     const listId = todo.listId;
 
-    // Remove the todo
+    await db.todos.delete(id);
+
+    // Remove the todo from local state
     const index = todos.value.findIndex(t => t.id === id);
     todos.value.splice(index, 1);
 
     // Reorder remaining todos in the same list
     const listTodos = todos.value.filter(t => t.listId === listId);
-    listTodos.forEach((t, idx) => {
+    const now = Date.now();
+    const reorders = listTodos.map((t, idx) => {
       t.order = idx;
+      t.updatedAt = now;
+      return { id: t.id, order: idx, updatedAt: now };
     });
-
-    await saveTodos(todos.value);
+    await db.todos.updateOrders(reorders);
   }
 
   async function toggleTodo(id: string) {
     const todo = todos.value.find(t => t.id === id);
     if (!todo) return;
 
-    todo.completed = !todo.completed;
-    todo.updatedAt = Date.now();
+    const completed = !todo.completed;
+    const updatedAt = Date.now();
 
-    await saveTodos(todos.value);
+    await db.todos.update(id, { completed, updatedAt });
+
+    todo.completed = completed;
+    todo.updatedAt = updatedAt;
   }
 
   async function reorderTodos(listId: string, reorderedTodos: Todo[]) {
-    // Update order for reordered todos
-    reorderedTodos.forEach((todo, idx) => {
+    const now = Date.now();
+    const reorders = reorderedTodos.map((todo, idx) => {
       todo.order = idx;
-      todo.updatedAt = Date.now();
+      todo.updatedAt = now;
+      return { id: todo.id, order: idx, updatedAt: now };
     });
+
+    await db.todos.updateOrders(reorders);
 
     // Replace todos for this list
     const otherTodos = todos.value.filter(t => t.listId !== listId);
     todos.value = [...otherTodos, ...reorderedTodos];
-
-    await saveTodos(todos.value);
   }
 
   async function moveTodo(todoId: string, newListId: string) {
@@ -108,22 +119,25 @@ export const useTodoStore = defineStore('todos', () => {
     if (!todo) return;
 
     const oldListId = todo.listId;
+    const now = Date.now();
 
     // Update todo's listId
     todo.listId = newListId;
-    todo.updatedAt = Date.now();
+    todo.updatedAt = now;
 
     // Reorder old list
     const oldListTodos = todos.value.filter(t => t.listId === oldListId);
-    oldListTodos.forEach((t, idx) => {
+    const oldReorders = oldListTodos.map((t, idx) => {
       t.order = idx;
+      return { id: t.id, order: idx, updatedAt: now };
     });
 
     // Set new order in new list (add to end)
     const newListTodos = todos.value.filter(t => t.listId === newListId);
     todo.order = newListTodos.length - 1;
 
-    await saveTodos(todos.value);
+    await db.todos.update(todoId, { listId: newListId, order: todo.order, updatedAt: now });
+    await db.todos.updateOrders(oldReorders);
   }
 
   // Checklist operations
@@ -137,10 +151,12 @@ export const useTodoStore = defineStore('todos', () => {
       completed: false,
     };
 
+    const order = todo.checklist.length;
+    await db.checklist.add(todoId, newItem, order);
+
     todo.checklist.push(newItem);
     todo.updatedAt = Date.now();
-
-    await saveTodos(todos.value);
+    await db.todos.update(todoId, { updatedAt: todo.updatedAt });
 
     return newItem;
   }
@@ -152,10 +168,12 @@ export const useTodoStore = defineStore('todos', () => {
     const item = todo.checklist.find(i => i.id === itemId);
     if (!item) return;
 
-    item.completed = !item.completed;
-    todo.updatedAt = Date.now();
+    const completed = !item.completed;
+    await db.checklist.update(itemId, { completed });
 
-    await saveTodos(todos.value);
+    item.completed = completed;
+    todo.updatedAt = Date.now();
+    await db.todos.update(todoId, { updatedAt: todo.updatedAt });
   }
 
   async function updateChecklistItem(todoId: string, itemId: string, text: string) {
@@ -165,10 +183,11 @@ export const useTodoStore = defineStore('todos', () => {
     const item = todo.checklist.find(i => i.id === itemId);
     if (!item) return;
 
+    await db.checklist.update(itemId, { text });
+
     item.text = text;
     todo.updatedAt = Date.now();
-
-    await saveTodos(todos.value);
+    await db.todos.update(todoId, { updatedAt: todo.updatedAt });
   }
 
   async function deleteChecklistItem(todoId: string, itemId: string) {
@@ -178,10 +197,11 @@ export const useTodoStore = defineStore('todos', () => {
     const index = todo.checklist.findIndex(i => i.id === itemId);
     if (index === -1) return;
 
+    await db.checklist.delete(itemId);
+
     todo.checklist.splice(index, 1);
     todo.updatedAt = Date.now();
-
-    await saveTodos(todos.value);
+    await db.todos.update(todoId, { updatedAt: todo.updatedAt });
   }
 
   return {

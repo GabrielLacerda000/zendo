@@ -6,6 +6,7 @@ import { cn } from '../../../shared/utils/cn';
 import { Todo } from '../../../types/Todo';
 import BaseInput from '../../../shared/components/BaseInput.vue';
 import { STAGGER_DELAY } from '../../../shared/constants/animations';
+import { notify } from '@/shared/utils/toast';
 
 interface Props {
   todo: Todo
@@ -39,6 +40,7 @@ const animateState = computed(() => {
 const handleDelete = (event: Event) => {
   event.stopPropagation()
   isDeleting.value = true
+   notify.success('Todo deleted')
   setTimeout(() => {
     todoStore.deleteTodo(props.todo.id)
   }, 200)
