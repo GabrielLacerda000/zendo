@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { Toaster } from 'vue-sonner'
+import 'vue-sonner/style.css'
 import Sidebar from './shared/components/Sidebar.vue'
 import MainContent from './shared/components/MainContent.vue'
 import TodoDetailModal from './shared/components/TodoDetailModal.vue'
@@ -39,6 +41,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <Toaster position="bottom-left" :duration="3000" richColors   />
   <div v-if="isLoading" class="h-screen `bg-(--color-main-bg) flex items-center justify-center">
     <div class="text-gray-800 dark:text-gray-100">Loading...</div>
   </div>

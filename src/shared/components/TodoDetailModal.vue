@@ -3,6 +3,7 @@ import { ref, computed, nextTick } from "vue";
 import { Motion } from "motion-v";
 import { Todo } from "../../types/Todo";
 import { useTodoStore } from "../../modules/todos/stores/todoStore";
+import { notify } from "../utils/toast";
 import Btn from "./Btn.vue";
 import BaseInput from "./BaseInput.vue";
 import AnimatedCheckbox from "./AnimatedCheckbox.vue";
@@ -38,6 +39,7 @@ const saveDescription = async () => {
         await todoStore.updateTodo(props.todo.id, {
             description: localDescription.value,
         });
+        notify.success("Description updated");
     }
 };
 
@@ -73,6 +75,7 @@ const saveTitle = async () => {
     const trimmedTitle = localTitle.value.trim();
     if (trimmedTitle && trimmedTitle !== props.todo.title) {
         await todoStore.updateTodo(props.todo.id, { title: trimmedTitle });
+        notify.success("Todo title updated");
     } else if (!trimmedTitle) {
         // If empty, revert to original
         localTitle.value = props.todo.title;

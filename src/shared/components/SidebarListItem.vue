@@ -74,14 +74,14 @@ const handleCancelDelete = () => {
       <button
         @click="handleClick"
         :class="[
-          'flex-1 px-3 py-2 rounded-lg text-left transition-all',
+          'flex-1 px-3 py-2 rounded-lg text-left transition-all flex items-center min-w-0',
           isActive
             ? 'bg-[var(--color-sidebar-item-active)] text-emerald-700 dark:text-emerald-400 font-medium'
             : 'hover:bg-[var(--color-sidebar-item-hover)] text-gray-700 dark:text-gray-300'
         ]"
       >
-        {{ list.name }}
-        <span class="text-xs ml-2 opacity-70">({{ todoCount }})</span>
+        <span class="truncate">{{ list.name }}</span>
+        <span class="text-xs ml-2 opacity-70 flex-shrink-0">({{ todoCount }})</span>
       </button>
 
       <!-- Delete button (appears on hover) -->
