@@ -41,21 +41,27 @@ const handleCreate = async () => {
 </script>
 
 <template>
-  <div class="flex gap-3 items-start">
+  <div
+    class="flex items-center gap-2 p-1 border rounded-xl transition-all focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500"
+    :class="isCreatingInvalidTodo ? 'border-red-500' : 'border-brand-border'"
+  >
     <BaseInput
       v-model="todoInput"
+      variant="bare"
       placeholder="What needs to be done?"
-      class="flex-1"
-      :isInvalid="isCreatingInvalidTodo"
-      :error="validationError"
       @keyup.enter="handleCreate"
+      class="flex-1 border-none focus:ring-0"
     />
 
     <button
       @click="handleCreate"
-      class="p-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors cursor-pointer"
+      class="p-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors cursor-pointer m-2"
     >
       <Plus class="w-5 h-5 text-white" />
     </button>
   </div>
+
+  <p v-if="isCreatingInvalidTodo" class="mt-1 text-xs text-red-500 ml-2">
+    {{ validationError }}
+  </p>
 </template>
