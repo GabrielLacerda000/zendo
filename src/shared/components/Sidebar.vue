@@ -12,7 +12,7 @@ const validationError = ref("");
 
 const inputContainerClasses = computed(() => {
     const base =
-        "flex items-center gap-1 p-1 bg-white dark:bg-brand-background-secondary border-2 rounded-xl transition-all";
+        "flex items-center gap-1 p-1 bg-white dark:bg-transparent border rounded-xl transition-all";
 
     const focusStyles =
         "focus-within:ring-2 focus-within:border-emerald-500 focus-within:ring-emerald-500/20";

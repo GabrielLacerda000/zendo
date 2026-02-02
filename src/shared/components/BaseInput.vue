@@ -24,7 +24,17 @@ const inputClasses = computed(() => {
         "bg-transparent dark:text-gray-100 text-gray-800 placeholder:text-gray-400 dark:placeholder:text-gray-500";
 
     if (props.variant === "bare") {
-        return [base, colors, "border-none focus:ring-0 px-2 py-3"].join(" ");
+        return [
+            "w-full bg-transparent",
+            "text-gray-800 dark:text-gray-100",
+            "placeholder:text-gray-400 dark:placeholder:text-gray-500",
+
+            "border-0 outline-none ring-0 shadow-none",
+            "focus:border-0 focus:outline-none focus:ring-0 focus:shadow-none",
+            "focus-visible:border-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:shadow-none",
+
+            "px-2 py-3",
+        ].join(" ");
     }
 
     const borderStyle = props.isInvalid

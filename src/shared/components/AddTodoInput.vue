@@ -50,7 +50,7 @@ const handleCreate = async () => {
       variant="bare"
       placeholder="What needs to be done?"
       @keyup.enter="handleCreate"
-      class="flex-1 border-none focus:ring-0"
+      class="flex-1 border-none"
     />
 
     <button
