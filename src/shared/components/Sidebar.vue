@@ -45,13 +45,12 @@ const handleCreateList = async () => {
         class="w-64 bg-[var(--color-sidebar-bg)] border-r border-[var(--color-sidebar-border)] flex flex-col relative transition-colors"
     >
         <div class="p-6 border-b border-[var(--color-sidebar-border)]">
-            <div class="flex items-center gap-2">
-                <CheckSquare
-                    class="w-6 h-6 text-emerald-600 dark:text-emerald-500"
-                />
-                <h1 class="text-xl font-bold text-[var(--color-sidebar-text)]">
-                    Zendo
-                </h1>
+            <div class="flex items-center gap-2 group">
+                <div
+                    className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center transform group-hover:rotate-12 transition-transform"
+                >
+                    <span className="text-white font-black text-xl">Z</span>
+                </div>
             </div>
         </div>
 
